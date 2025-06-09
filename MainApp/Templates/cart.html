@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+{% if messages %}
+  <div 
+    x-data="{ show: true }" 
+    x-init="setTimeout(() => show = false, 3000)" 
+    x-show="show"
+    x-transition
+    class="fixed top-4 right-2 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg z-50"
+  >
+    {% for message in messages %}
+      {{ message }}
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="container my-5 shadow fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+  </div>
+
+  <table class="table table-hover table-bordered align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Product</th>
+        <th class="text-center">Quantity</th>
+        <th class="text-end">Price</th>
+        <th class="text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart_items %}
+      <tr class="fade-in">
+        <td><i class="fas fa-box-open me-2 text-primary"></i>{{ item.product.name }}</td>
+        <td class="text-center">{{ item.quantity }}</td>
+        <td class="text-end">रू{{ item.product.price }}</td>
+        <td class="text-center">
+          <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove one quantity">
+              <i class="fas fa-minus-circle"></i> Remove
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" class="text-end fw-bold">Total:</td>
+        <td class="text-end fw-bold">रू{{ total }}</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="row mt-4">
+    <div class="col-md-6 mb-3">
+      <form method="post" action="{% url 'apply_coupon' %}">
+        {% csrf_token %}
+        <div class="input-group">
+          <input type="text" name="coupon_code" class="form-control" placeholder="Enter coupon code" required>
+          <button class="btn btn-outline-primary" type="submit">
+            <i class="fas fa-tag"></i> Apply Coupon
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-md-6 text-end">
+      <form method="post" action="{% url 'payment_view' %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-success btn-lg">
+    <i class="fas fa-credit-card"></i> Pay Now
+  </button>
+</form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

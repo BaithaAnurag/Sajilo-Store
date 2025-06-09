@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" x-data="darkMode()" x-init="init()" :class="{ 'dark': isDark }" class="transition-colors duration-500">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sajilo Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .animate-fade-in { animation: fade-in 1s ease-out; }
+      .animate-spin-slow { animation: spin 4s linear infinite; }
+
+      @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 6s linear infinite;
+    }
+    </style>
+  </head>
+  <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-500">
+
+
+        <!-- Navbar -->
+      <nav x-data="{ mobileMenuOpen: false, isDark: false, toggle() { this.isDark = !this.isDark; document.documentElement.classList.toggle('dark', this.isDark); } }"
+          class="bg-white dark:bg-gray-800 shadow border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16 items-center">
+            <!-- Logo -->
+          <a href="/"
+        class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 transition duration-300 ease-in-out transform hover:scale-105 hover:text-blue-700 dark:hover:text-blue-300">
+        Sajilo Store
+      </a>
+
+
+            <!-- Desktop Links -->
+      <div class="hidden md:flex space-x-8" x-data="{ navVisible: false }" x-init="setTimeout(() => navVisible = true, 400)">
+        <a href="/" x-show="navVisible"
+          x-transition:enter="transition ease-out duration-500 delay-[100ms]"
+          x-transition:enter-start="opacity-0 translate-x-6"
+          x-transition:enter-end="opacity-100 translate-x-0"
+          class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+          Home
+        </a>
+        <a href="/shop/" x-show="navVisible"
+          x-transition:enter="transition ease-out duration-500 delay-[200ms]"
+          x-transition:enter-start="opacity-0 translate-x-6"
+          x-transition:enter-end="opacity-100 translate-x-0"
+          class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+          Shop
+        </a>
+        <a href="/about/" x-show="navVisible"
+          x-transition:enter="transition ease-out duration-500 delay-[300ms]"
+          x-transition:enter-start="opacity-0 translate-x-6"
+          x-transition:enter-end="opacity-100 translate-x-0"
+          class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+          About
+        </a>
+        <a href="/contact/" x-show="navVisible"
+          x-transition:enter="transition ease-out duration-500 delay-[400ms]"
+          x-transition:enter-start="opacity-0 translate-x-6"
+          x-transition:enter-end="opacity-100 translate-x-0"
+          class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+          Contact
+        </a>
+        <a href="/login/" x-show="navVisible"
+          x-transition:enter="transition ease-out duration-500 delay-[500ms]"
+          x-transition:enter-start="opacity-0 translate-x-6"
+          x-transition:enter-end="opacity-100 translate-x-0"
+          class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+          Signin
+        </a>
+      </div>
+
+
+          <!-- Right Side (Dark mode + Mobile toggle) -->
+          <div class="flex items-center space-x-4">
+            <!-- Dark Mode Toggle -->
+            <button @click="toggle()" class="focus:outline-none text-xl" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+              <span x-show="!isDark" x-cloak>🌙</span>
+              <span x-show="isDark" x-cloak>☀️</span>
+            </button>
+
+            <!-- Profile emoji link only for logged-in users -->
+            {% if user.is_authenticated %}
+              <a href="{% url 'profile_view' %}" title="Profile" class="text-xl hover:text-blue-600" aria-label="Profile">
+                👤
+              </a>
+            {% endif %}
+          </div>
+
+              
+
+              <!-- Mobile Menu Button -->
+              <div class="md:hidden">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Toggle menu" class="focus:outline-none text-2xl">
+                  <template x-if="!mobileMenuOpen">&#9776;</template> <!-- Hamburger -->
+                  <template x-if="mobileMenuOpen">&times;</template> <!-- Close -->
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen"
+            @click.outside="mobileMenuOpen = false"
+            x-transition
+            class="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+            x-cloak>
+          <div class="px-4 pt-2 pb-4 space-y-1">
+            <a href="/" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Home</a>
+            <a href="/shop/" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Shop</a>
+            <a href="/about/" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">About</a>
+            <a href="/contact/" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Contact</a>
+            <a href="/login/" class="block px-3 py-2 rounded text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700">Login</a>
+          </div>
+        </div>
+      </nav>
+
+
+        <!-- Hero Section -->
+        <section class="bg-gray-100 dark:bg-gray-800 py-16 transition-colors duration-500">
+          <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600 animate-pulse">
+              Discover Our Latest Collection
+            </h1>
+            <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Trendy. Affordable. Quality Guaranteed.</p>
+            <a href="/shop/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition">Shop Now</a>
+          </div>
+        </section>
+
+        <!-- Logs With Animations -->
+        <div class="relative py-16 px-6 md:px-10 bg-gradient-to-br  rounded-2xl shadow-xl">
+
+
+
+             
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+                  x-data="{ show: false }"
+                  x-init="setTimeout(() => show = true, 300)"
+                  x-show="show"
+                  x-transition:enter="transition ease-out duration-1000"
+                  x-transition:enter-start="opacity-0 scale-90"
+                  x-transition:enter-end="opacity-100 scale-100">
+
+                <!-- Fresh Vegetables -->
+                <div class="flex flex-col items-center group cursor-pointer" title="We use only fresh, organic vegetables." role="group" aria-label="Fresh Vegetables">
+                  <div class="text-6xl animate-bounce mb-2 group-hover:scale-110 group-hover:drop-shadow-lg transition">🥦</div>
+                  
+                </div>
+
+                <!-- Delicious Food -->
+                <div class="flex flex-col items-center group cursor-pointer" title="Prepared with care and taste in mind." role="group" aria-label="Delicious Meals">
+                  <div class="text-6xl animate-pulse mb-2 group-hover:scale-110 group-hover:drop-shadow-lg transition">🍽️</div>
+                  
+                </div>
+
+                <!-- Handmade Craft -->
+                <div class="flex flex-col items-center group cursor-pointer" title="Crafted by hand with love and skill." role="group" aria-label="Handmade Touch">
+                  <div class="text-6xl animate-spin-slow mb-2 group-hover:scale-110 group-hover:drop-shadow-lg transition">👐</div>
+                  
+                </div>
+
+                <!-- Quality Certified -->
+                <div class="flex flex-col items-center group cursor-pointer" title="Verified for quality and satisfaction." role="group" aria-label="Top Quality">
+                  <div class="text-6xl animate-bounce mb-2 group-hover:scale-110 group-hover:drop-shadow-lg transition">✅</div>
+                 
+                </div>
+
+              </div>
+            </div>
+
+        <!-- Featured Products Carousel -->
+         {% if messages %}
+            <div 
+              x-data="{ show: true }" 
+              x-init="setTimeout(() => show = false, 3000)" 
+              x-show="show"
+              x-transition
+              class="fixed top-4 right-2 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg z-50"
+            >
+              {% for message in messages %}
+                {{ message }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+       <section class="py-12 bg-white dark:bg-gray-900 transition-colors duration-500">
+          <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-2xl font-bold mb-6">Featured Products</h2>
+
+            <div class="flex flex-wrap gap-6 justify-start">
+              {% for product in featured_products %}
+              <div class="w-full sm:w-[48%] md:w-[31%] lg:w-[23%] bg-white dark:bg-gray-800 shadow rounded-xl overflow-hidden hover:shadow-lg transition">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover" loading="lazy" />
+                <div class="p-4">
+                  <h3 class="text-lg font-semibold mb-1">{{ product.name }}</h3>
+                  <p class="text-gray-600 dark:text-gray-300 mb-2">रू{{ product.price }}</p>
+                  <div class="flex justify-between items-center">
+                    <a href="{% url 'product_detail' product.id %}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm">View</a>
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'add_to_cart' product.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs transition">
+                        Add to Cart
+                      </button>
+                    </form>
+                    {% else %}
+                    <a href="{% url 'login_view' %}?next={{ request.path }}" 
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs transition">
+                      Add to Cart
+                    </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+
+
+        
+        <!-- Testimonials -->
+        <section class="bg-gray-50 dark:bg-gray-800 py-12 transition-colors duration-500"
+                x-data="{ current: 0, testimonials: ['\u201cAmazing quality and super fast delivery!\u201d', '\u201cHandmade items that truly feel personal!\u201d', '\u201cCustomer service was top-notch!\u201d'], 
+                          next() { this.current = (this.current + 1) % this.testimonials.length } }"
+                x-init="setInterval(() => next(), 4000)">
+          <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-2xl font-bold mb-6">What Our Customers Say</h2>
+            <template x-if="testimonials.length">
+              <div>
+                <p class="italic text-gray-700 dark:text-gray-300 text-lg mb-2" x-text="testimonials[current]"></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400"> Verified Buyer</p>
+              </div>
+            </template>
+          </div>
+        </section>
+       
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8 mt-12 transition-colors duration-500">
+          <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <h3 class="text-lg font-bold mb-2">Sajilo Store</h3>
+              <p class="text-sm">{% now "Y" %} All rights reserved.</p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">Quick Links</h4>
+              <ul class="space-y-1 text-sm">
+                <li><a href="/shop/" class="hover:underline">Shop</a></li>
+                <li><a href="/about/" class="hover:underline">About</a></li>
+                <li><a href="/contact/" class="hover:underline">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">Follow Us</h4>
+              <ul class="space-y-1 text-sm">
+                <li><a href="#" class="hover:underline">Instagram</a></li>
+                <li><a href="#" class="hover:underline">Facebook</a></li>
+                <li><a href="#" class="hover:underline">Twitter</a></li>
+              </ul>
+            </div>
+          </div>
+        </footer>
+          
+
+          
+            <!-- Floating Cart Icon -->
+          <a href="/cart/"
+            class="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-14 h-14 flex items-center justify-center transition duration-300"
+            aria-label="View Cart">
+
+            <div class="relative text-2xl">
+              🛒
+              <span id="floating-cart-count"
+                    class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1"
+                    hx-get="{% url 'view_cart' %}"
+                    hx-trigger="load, cartUpdated from:body"
+                    hx-swap="outerHTML">
+                
+              </span>
+            </div>
+          </a>
+
+
+          
+
+
+
+        <script>
+          function darkMode() {
+            return {
+              isDark: false,
+              init() {
+                const saved = localStorage.getItem('darkMode');
+                if (saved !== null) {
+                  this.isDark = saved === 'true';
+                } else {
+                  this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+                this.apply();
+              },
+              toggle() {
+                this.isDark = !this.isDark;
+                localStorage.setItem('darkMode', this.isDark);
+                this.apply();
+              },
+              apply() {
+                if (this.isDark) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              }
+            }
+          }
+        </script>
+
+</body>
+</html>

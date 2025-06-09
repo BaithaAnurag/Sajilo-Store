@@ -1,0 +1,98 @@
+<!-- templates/base.html -->
+ {% load static %}
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', toggleDark() { this.darkMode = !this.darkMode; localStorage.setItem('darkMode', this.darkMode) } }" x-bind:class="{ 'dark': darkMode }">
+<head>
+<style>
+  a:hover {
+    transition: all 0.3s ease-in-out;
+  }
+</style>
+
+
+    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>{% block title %}Sajilo Store{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+  <script src="https://unpkg.com/htmx.org" defer></script>
+  <link rel="icon" href="{% static 'favicon.ico' %}">
+
+</head>
+<body class="bg-bg-gray dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+  <!-- Navbar -->
+  <header class="bg- dark:bg-white-800 shadow sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-blue-600 dark:text-blue-400">Sajilo Store</a>
+      <nav class="space-x-6">
+        <div class="hidden md:flex space-x-8" x-data="{ navVisible: false }" x-init="setTimeout(() => navVisible = true, 400)">
+          <a href="/" x-show="navVisible"
+            x-transition:enter="transition ease-out duration-500 delay-[100ms]"
+            x-transition:enter-start="opacity-0 translate-x-6"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+            Home
+          </a>
+          <a href="/shop/" x-show="navVisible"
+            x-transition:enter="transition ease-out duration-500 delay-[200ms]"
+            x-transition:enter-start="opacity-0 translate-x-6"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+            Shop
+          </a>
+          <a href="/about/" x-show="navVisible"
+            x-transition:enter="transition ease-out duration-500 delay-[300ms]"
+            x-transition:enter-start="opacity-0 translate-x-6"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+            About
+          </a>
+          <a href="/contact/" x-show="navVisible"
+            x-transition:enter="transition ease-out duration-500 delay-[400ms]"
+            x-transition:enter-start="opacity-0 translate-x-6"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            class="hover:text-blue-500 dark:hover:text-blue-300" x-cloak>
+            Contact
+          </a>
+        {% if user.is_authenticated %}
+          <a href="/logout/" class="hover:text-red-500">Logout</a>
+        {% else %}
+          <a href="/login/" class="hover:text-blue-600">Login</a>
+        {% endif %}
+        <!-- Dark mode toggle -->
+        <button @click="toggleDark" class="ml-4 text-sm border rounded px-2 py-1">🌓</button>
+        {% if user.is_authenticated %}
+              <a href="{% url 'profile_view' %}" title="Profile" class="text-xl hover:text-blue-600" aria-label="Profile">
+                👤
+              </a>
+            {% endif %}
+          </div>
+      </nav>
+    </div>
+  </header>
+
+
+  <!-- Floating Cart -->
+  <a href="/cart/" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg">
+    🛒
+    
+  </a>
+
+  <!-- Main Content -->
+  <main class="py-6">
+      {% block content %}{% endblock %}
+  </main>
+  
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p>&copy; {% now "Y" %} Sajilo Store. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

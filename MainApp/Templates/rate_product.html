@@ -1,0 +1,9 @@
+<!-- templates/rate_product.html -->
+<h2>Rate {{ product.name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="rating">Enter Rating (1-5):</label>
+    <input type="number" name="rating" min="1" max="5" required>
+    <button type="submit">Submit</button>
+</form>

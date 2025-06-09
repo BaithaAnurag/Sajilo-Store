@@ -1,0 +1,73 @@
+<!-- templates/payment.html -->
+<div class="max-w-xl mx-auto mt-10 text-center">
+  <h2 class="text-2xl font-semibold mb-4">Choose a Payment Method</h2>
+
+  <div class="flex justify-center gap-6 items-center">
+    <!-- eSewa Payment Button -->
+    <form action="https://uat.esewa.com.np/epay/main" method="POST">
+      <input type="hidden" name="tAmt" value="{{ amount }}">
+      <input type="hidden" name="amt" value="{{ amount }}">
+      <input type="hidden" name="txAmt" value="0">
+      <input type="hidden" name="psc" value="0">
+      <input type="hidden" name="pdc" value="0">
+      <input type="hidden" name="scd" value="YOUR_ESEWA_MERCHANT_CODE">
+      <input type="hidden" name="pid" value="{{ order_id }}">
+      <input type="hidden" name="su" value="{% url 'esewa_success' %}">
+      <input type="hidden" name="fu" value="{% url 'esewa_failure' %}">
+      <button type="submit" class="rounded-xl bg-white p-2 shadow-md hover:shadow-lg transition">
+        <img src="https://cdn.esewa.com.np/ui/images/esewa-icon-large.png"
+             alt="Pay with eSewa" class="h-14 w-auto">
+      </button>
+    </form>
+
+    <!-- Khalti Payment Button -->
+    <button id="khalti-pay-button" class="rounded-xl bg-white p-2 shadow-md hover:shadow-lg transition">
+      <img src="https://khalti.com/static/images/logo/khalti_logo.svg"
+           alt="Pay with Khalti" class="h-14 w-auto">
+    </button>
+  </div>
+</div>
+
+<!-- Khalti Script -->
+<script src="https://khalti.com/static/khalti-checkout.js"></script>
+<script>
+  var khaltiConfig = {
+    publicKey: "test_public_key_dc74e7ab7e5b4ca...",  // Replace with your test/live key
+    productIdentity: "{{ order_id }}",
+    productName: "Order {{ order_id }}",
+    productUrl: "https://yourwebsite.com/products/{{ order_id }}",
+    paymentPreference: ["KHALTI"],
+    eventHandler: {
+      onSuccess(payload) {
+        fetch("{% url 'khalti_verify' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+          body: JSON.stringify(payload),
+        }).then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert("Khalti Payment Successful!");
+              window.location.href = "/payment/success/";
+            } else {
+              alert("Verification failed: " + (data.message || ""));
+            }
+          });
+      },
+      onError(error) {
+        console.log("Khalti error:", error);
+        alert("Payment failed.");
+      },
+      onClose() {
+        console.log("Khalti widget closed.");
+      }
+    }
+  };
+
+  var checkout = new KhaltiCheckout(khaltiConfig);
+  document.getElementById("khalti-pay-button").onclick = function () {
+    checkout.show({ amount: {{ amount }} * 100 });  // Amount in paisa
+  }
+</script>
